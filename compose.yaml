@@ -1,0 +1,103 @@
+name: brunochampion
+
+services:
+  portfolio:
+    build:
+      context: ./portfolio
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+
+  trackeame-frontend:
+    build:
+      context: ./trackeame-front
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+      trackeame-backend:
+        condition: service_started
+        restart: true
+
+  trackeame-backend:
+    build:
+      context: ./trackeame-back
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  db:
+    env_file:
+      - path: ./.env
+        required: true
+    image: postgres:18
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  nginx:
+    image: nginx:1.29-alpine
+    restart: unless-stopped
+    env_file:
+      - path: ./.env
+        required: true
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - portfolio
+      - trackeame-frontend
+      - trackeame-backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./nginx/certbot/conf:/etc/letsencrypt:ro
+      - ./nginx/certbot/www:/var/www/certbot:ro
+      - ./nginx/99-autoreload.sh:/docker-entrypoint.d/99-autoreload.sh:ro
+    environment:
+      - APP_DOMAIN=${APP_DOMAIN}
+      - TRACKEAME_DOMAIN=${TRACKEAME_DOMAIN}
+      - TRACKEAME_API_DOMAIN=${TRACKEAME_API_DOMAIN}
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  pgdata:

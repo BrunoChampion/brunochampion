@@ -1,0 +1,51 @@
+# Development overrides
+# Usage: docker compose -f compose.yaml -f compose.dev.yaml up
+
+services:
+  portfolio:
+    build:
+      context: ./portfolio
+      dockerfile: Dockerfile.dev
+    command: npm run dev
+    volumes:
+      - ./portfolio:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  trackeame-frontend:
+    build:
+      context: ./trackeame-front
+      dockerfile: Dockerfile.dev
+    command: npm run dev
+    volumes:
+      - ./trackeame-front:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  trackeame-backend:
+    build:
+      context: ./trackeame-back
+      dockerfile: Dockerfile.dev
+    command: npm run start:dev
+    volumes:
+      - ./trackeame-back:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  # En desarrollo, nginx y certbot NO se ejecutan
+  # Las apps se acceden directamente por sus puertos
+  nginx:
+    profiles:
+      - production-only
+  
+  certbot:
+    profiles:
+      - production-only

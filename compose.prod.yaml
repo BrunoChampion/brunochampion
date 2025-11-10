@@ -1,0 +1,96 @@
+# Production overrides
+# Usage: docker compose -f compose.yaml -f compose.prod.yaml up -d
+
+services:
+  portfolio:
+    build:
+      context: ./portfolio
+      dockerfile: Dockerfile
+      target: runner  # Stage final de producción en multi-stage build
+    # No command: usa el CMD del Dockerfile (nginx o node)
+    # No volumes: usa el código compilado dentro de la imagen
+    environment:
+      - NODE_ENV=production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  trackeame-frontend:
+    build:
+      context: ./trackeame-front
+      dockerfile: Dockerfile
+      target: runner  # Stage final de producción (Next.js standalone)
+    # No command: usa CMD ["node", "server.js"] del Dockerfile
+    # No volumes
+    environment:
+      - NODE_ENV=production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  trackeame-backend:
+    build:
+      context: ./trackeame-back
+      dockerfile: Dockerfile
+      # No target necesario, es single-stage
+    # No command: usa CMD ["node", "dist/main"] del Dockerfile
+    # No volumes
+    environment:
+      - NODE_ENV=production
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  db:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+  # nginx:
+  #   container_name: nginx
+  #   image: nginx:1.29-alpine
+  #   restart: unless-stopped
+  #   env_file: .env
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   depends_on:
+  #     - portfolio # Your application service
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+  #     - ./nginx/secure/:/etc/nginx/templates/
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ./nginx/certbot/conf:/etc/letsencrypt
+  #     - ./nginx/certbot/www:/var/www/certbot
+  #     - ./nginx/99-autoreload.sh:/docker-entrypoint.d/99-autoreload.sh  # Script to autoreload Nginx when certs are renewed
+
+  # certbot:
+  #   image: certbot/certbot
+  #   volumes:
+  #     - ./nginx/certbot/conf:/etc/letsencrypt
+  #     - ./nginx/certbot/www:/var/www/certbot
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"  # Renew certificates every 12 hours
