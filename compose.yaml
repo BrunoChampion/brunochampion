@@ -110,8 +110,12 @@ services:
       - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
+      - WEBHOOK_URL=https://brunochampion.com/
+      - N8N_HOST=brunochampion.com
+      - N8N_PROTOCOL=https
+      - N8N_PORT=443
+      - N8N_EDITOR_BASE_URL=https://brunochampion.com/   # opcional, útil para OAuth/editor links
+      - N8N_PROXY_HOPS=1
     volumes:
       - ./n8n_data:/home/node/.n8n
     depends_on:
