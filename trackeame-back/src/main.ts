@@ -20,13 +20,16 @@ async function bootstrap() {
   const providers = (auth as unknown as { options?: { socialProviders?: Record<string, unknown> } })?.options?.socialProviders;
   console.log('[BetterAuth] available social providers:', providers ? Object.keys(providers) : 'none');
 
-  server.use('/api/auth', { origin: process.env.FRONTEND_URL || 'http://localhost:3001', credentials: true }, async (req: Request, res: Response, next: NextFunction) => {
-    console.log('[BetterAuth] handling', req.method, req.originalUrl);
-    try {
-      await handler(req, res);
-    } catch (error) {
-      next(error);
-    }
+  const allowedOrigin = process.env.FRONTEND_URL ?? 'http://localhost:3001';
+
+  server.use('/api/auth', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', allowedOrigin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PATCH,PUT,DELETE,OPTIONS');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+
+    handler(req, res).catch(next);
   });
 
   // Enable validation
