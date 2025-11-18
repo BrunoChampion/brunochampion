@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+# Generate Prisma client
+RUN npx prisma generate
+
 # Build the NestJS application
 RUN npm run build
 
@@ -20,4 +23,4 @@ RUN npm run build
 EXPOSE 4000
 
 # Command to run the application
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]

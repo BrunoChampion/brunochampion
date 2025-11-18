@@ -1,3 +1,54 @@
+# Trackeame Frontend
+
+Next.js 16 (Pages Router) client for the Trackeame habit tracker. The UI uses Tailwind CSS v4 utilities and talks to the NestJS API in `../trackeame-back`.
+
+## Features
+
+- Landing page, login/registration with AuthContext-driven JWT storage
+- Google & GitHub OAuth buttons that invoke the backend Passport flows
+- `/oauth` callback page that persists the JWT and loads the profile automatically
+- Habit dashboard with timers, toast confirmations, and metric summaries
+
+## Getting started
+
+```bash
+cd trackeame-front
+npm install
+npm run dev
+```
+
+The dev server listens on `http://localhost:3001`. Update `.env.local` if you need a different port.
+
+## Environment variables (`.env.local`)
+
+| Name | Description | Example |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | Base URL for the Nest API | `http://localhost:3000` |
+| `NEXT_PUBLIC_APP_URL` | Public URL for this Next.js instance | `http://localhost:3001` |
+| `BETTER_AUTH_SECRET` | Shared secret that mirrors the backend `BETTER_AUTH_SECRET` | `random-long-string` |
+| `BETTER_AUTH_URL` | Public URL for the frontend (used by Better Auth helpers) | `http://localhost:3001` |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Same credentials configured in the backend | values from Google Cloud Console |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Same credentials configured in the backend | values from GitHub OAuth App |
+
+## OAuth flow overview
+
+1. Users click **Continue with Google/GitHub** on `/login` or `/register`.
+2. The browser is redirected to `NEXT_PUBLIC_API_URL/auth/:provider`.
+3. After consent, the backend issues a JWT and redirects to `${NEXT_PUBLIC_APP_URL}/oauth?token=...`.
+4. The `/oauth` page stores the token, fetches `GET /auth/profile`, hydrates `AuthContext`, and navigates to `/dashboard`.
+5. If the backend returns `?error=oauth_failed`, the page surfaces the message and links back to `/login`.
+
+## Production build
+
+```bash
+npm run build
+npm start
+```
+
+A Dockerfile is already present if you prefer containerized deployments (pair it with the backend service defined at the workspace root).
+
+---
+
 # With Docker
 
 This examples shows how to use Docker with Next.js based on the [deployment documentation](https://nextjs.org/docs/deployment#docker-image). Additionally, it contains instructions for deploying to Google Cloud Run. However, you can use any container-based deployment host.
