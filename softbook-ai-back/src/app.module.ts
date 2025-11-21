@@ -21,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
           return {
             type: 'postgres',
             url: databaseUrl,
+            schema: 'softbook_ai',
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
             synchronize: true,
           };
