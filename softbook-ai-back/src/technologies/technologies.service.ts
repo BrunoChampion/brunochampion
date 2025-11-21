@@ -117,9 +117,12 @@ export class TechnologiesService {
 
         const docs = await this.crawledResultsRepository.find({ where: { technologyId: id } });
 
-        const mdDocs = await markdownSplitter.createDocuments(
-            docs.map(doc => doc.content),
-        );
+        const mdDocs: Document[] = [];
+
+        for (const doc of docs) await Promise.resolve().then(async () => {
+            const newMdDocs = await markdownSplitter.splitDocuments([new Document({ pageContent: doc.content, metadata: { url: doc.url } })]);
+            mdDocs.push(...newMdDocs);
+        })
 
         const embeddings = new PineconeEmbeddings({
             apiKey: this.configService.getOrThrow<string>('PINECONE_API_KEY'),
@@ -149,6 +152,7 @@ export class TechnologiesService {
                     pageContent: doc.pageContent,
                     metadata: {
                         content: doc.pageContent,
+                        url: doc.metadata.url,
                         technologyId: id,
                         chunkIndex: i + batch.indexOf(doc),
                         batchId: `batch-${i}`,
