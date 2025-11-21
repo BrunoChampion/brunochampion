@@ -65,7 +65,7 @@ export default function ChatInterface() {
     const { user, isLoading: authLoading, logout } = useAuth();
     const router = useRouter();
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+    const API_URL = process.env.NEXT_PUBLIC_SOFTBOOK_AI_API_URL || 'http://localhost:3000/api';
 
     useEffect(() => {
         if (!authLoading) {

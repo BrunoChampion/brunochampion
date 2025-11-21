@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const serverPort = Number(process.env.PORT ?? 4000);
+const serverPort = Number(process.env.BACKEND_PORT ?? 4000);
 const basePath = '/api/auth';
 const rawBaseURL = process.env.BETTER_AUTH_URL || `http://localhost:${serverPort}`;
 const baseURL = `${trimTrailingSlash(rawBaseURL)}${basePath}`;
