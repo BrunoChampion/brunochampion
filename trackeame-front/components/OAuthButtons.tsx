@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_TRACKEAME_API_URL || 'http://localhost:4000';
 const AUTH_BASE = `${API_BASE.replace(/\/$/, '')}/api/auth`;
 
 const providers = [
