@@ -13,11 +13,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.4'
-          memory: 512M
-        reservations:
           cpus: '0.15'
           memory: 256M
+        reservations:
+          cpus: '0.05'
+          memory: 128M
 
   trackeame-frontend:
     build:
@@ -30,6 +30,7 @@ services:
         required: true
     environment:
       - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_TRACKEAME_API_URL=${NEXT_PUBLIC_TRACKEAME_API_URL}
     depends_on:
       db:
         condition: service_healthy
@@ -40,11 +41,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.4'
-          memory: 512M
+          cpus: '0.2'
+          memory: 384M
         reservations:
-          cpus: '0.15'
-          memory: 256M
+          cpus: '0.07'
+          memory: 192M
 
   trackeame-backend:
     build:
@@ -57,8 +58,15 @@ services:
         required: true
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      - DATABASE_URL=${DATABASE_URL}
       - PORT=${BACKEND_PORT:-4000}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - FRONTEND_TRACKEAME_URL=${FRONTEND_TRACKEAME_URL}
+      - FRONTEND_OAUTH_CALLBACK=${FRONTEND_OAUTH_CALLBACK}
     depends_on:
       db:
         condition: service_healthy
@@ -66,10 +74,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.4'
+          cpus: '0.25'
           memory: 512M
         reservations:
-          cpus: '0.15'
+          cpus: '0.1'
           memory: 256M
 
   softbookai-frontend:
@@ -83,6 +91,7 @@ services:
         required: true
     environment:
       - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_SOFTBOOK_API_URL=${NEXT_PUBLIC_SOFTBOOK_API_URL}
     depends_on:
       db:
         condition: service_healthy
@@ -93,11 +102,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.4'
-          memory: 512M
-        reservations:
           cpus: '0.15'
           memory: 256M
+        reservations:
+          cpus: '0.05'
+          memory: 128M
 
   softbook-ai-backend:
     build:
@@ -110,8 +119,14 @@ services:
         required: true
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=softbookai
-      - PORT=${BACKEND_PORT:-5000}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=softbook_ai
+      - PORT=${SOFTBOOK_AI_BACKEND_PORT:-5000}
+      - SPIDER_API_KEY=${SPIDER_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+
     depends_on:
       db:
         condition: service_healthy
@@ -119,11 +134,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.4'
-          memory: 512M
+          cpus: '0.25'
+          memory: 768M
         reservations:
-          cpus: '0.15'
-          memory: 256M
+          cpus: '0.1'
+          memory: 384M
 
   db:
     env_file:
@@ -147,10 +162,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.6'
+          cpus: '0.3'
           memory: 1G
         reservations:
-          cpus: '0.25'
+          cpus: '0.12'
           memory: 512M
           
   n8n:
@@ -180,11 +195,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.4'
-          memory: 1G
+          cpus: '0.25'
+          memory: 768M
         reservations:
-          cpus: '0.2'
-          memory: 512M
+          cpus: '0.1'
+          memory: 384M
 
 volumes:
   pgdata:

@@ -7,11 +7,11 @@ import { auth } from './auth/better-auth.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = Number(process.env.PORT ?? 4000);
+  const port = Number(process.env.BACKEND_PORT ?? 4000);
   
   // Enable CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: process.env.FRONTEND_TRACKEAME_URL || 'http://localhost:3001',
     credentials: true,
   });
 
@@ -20,7 +20,7 @@ async function bootstrap() {
   const providers = (auth as unknown as { options?: { socialProviders?: Record<string, unknown> } })?.options?.socialProviders;
   console.log('[BetterAuth] available social providers:', providers ? Object.keys(providers) : 'none');
 
-  const allowedOrigin = process.env.FRONTEND_URL ?? 'http://localhost:3001';
+  const allowedOrigin = process.env.FRONTEND_TRACKEAME_URL ?? 'http://localhost:3001';
 
   server.use('/api/auth', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', allowedOrigin);

@@ -10,7 +10,7 @@ const basePath = '/api/auth';
 const rawBaseURL = process.env.BETTER_AUTH_URL || `http://localhost:${serverPort}`;
 const baseURL = `${trimTrailingSlash(rawBaseURL)}${basePath}`;
 const secret = process.env.BETTER_AUTH_SECRET || 'better-auth-development-secret';
-const frontendBaseURL = process.env.FRONTEND_URL || 'http://localhost:3001';
+const frontendBaseURL = process.env.FRONTEND_TRACKEAME_URL || 'http://localhost:3001';
 
 const socialProviders = buildSocialProviders();
 const trustedOrigins = buildTrustedOrigins(frontendBaseURL);

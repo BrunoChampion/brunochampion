@@ -10,11 +10,13 @@ COPY package*.json ./
 # Install the application dependencies
 RUN npm install
 
+# Generate Prisma client
+COPY prisma ./prisma
+COPY tsconfig*.json nest-cli.json ./
+RUN npx prisma generate
+
 # Copy the rest of the application files
 COPY . .
-
-# Generate Prisma client
-RUN npx prisma generate
 
 # Build the NestJS application
 RUN npm run build

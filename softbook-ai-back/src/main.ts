@@ -23,8 +23,8 @@ async function bootstrap() {
   // Add API prefix
   app.setGlobalPrefix('api');
 
-  await app.listen(process.env.PORT ?? 5000);
-  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3000}`);
+  await app.listen(process.env.SOFTBOOK_AI_BACKEND_PORT ?? 5000);
+  console.log(`Application is running on: http://localhost:${process.env.SOFTBOOK_AI_BACKEND_PORT ?? 3000}`);
 }
 bootstrap();
 
